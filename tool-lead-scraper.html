@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="payment-config.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
@@ -421,6 +422,14 @@
     });
 
     btnMockCheckoutLead.addEventListener('click', async () => {
+      const liveUrl = PAYMENT_CONFIG.getCheckoutUrl('leads_dataset') || PAYMENT_CONFIG.getCheckoutUrl('pro_monthly');
+      if (liveUrl) {
+        btnMockCheckoutLead.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังเปิดหน้าชำระเงิน Stripe...`;
+        lucide.createIcons();
+        window.location.href = liveUrl;
+        return;
+      }
+
       btnMockCheckoutLead.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Payment...`;
       lucide.createIcons();
 
@@ -431,7 +440,7 @@
           body: JSON.stringify({ plan: 'leads_full_dataset', amount: 29 })
         });
         const data = await res.json();
-        alert('🎉 Payment Confirmed!\nOrder Ref: ' + data.orderId + '\nAll 480 leads unlocked! Starting CSV export...');
+        alert('🎉 จำลองการชำระเงินสำเร็จ!\nOrder Ref: ' + data.orderId + '\nปลดล็อก 480 รายชื่อเรียบร้อย\n\n*หากต้องการรับเงินจริง ให้ไปที่หน้า Pricing เพื่อใส่ลิงก์ Stripe สำหรับ Lead Dataset*');
         
         // Unmask all leads
         currentLeads.forEach(l => l.isSample = true);
@@ -442,7 +451,7 @@
         // Trigger CSV download
         btnExportCSV.click();
       } catch (err) {
-        alert('Order simulated successfully! All leads unlocked.');
+        alert('จำลองการเปิดสิทธิ์สำเร็จ! หากต้องการรับเงินจริง ให้ใส่ลิงก์ Stripe ที่หน้า Pricing');
         currentLeads.forEach(l => l.isSample = true);
         renderLeads(currentLeads);
         unlockModal.classList.add('hidden');

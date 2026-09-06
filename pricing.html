@@ -3,13 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pricing Plans — OmniTools 24/7 Digital Utility Suite</title>
-  <meta name="description" content="Transparent, predictable pricing for DocTable AI, LeadPulse B2B, and RelayForm. Free tier available, upgrade for high-volume automated exports.">
+  <title>Pricing & Real Payment Gateway — OmniTools 24/7 Digital Utility Suite</title>
+  <meta name="description" content="Transparent pricing for DocTable AI, LeadPulse B2B, and RelayForm. Connect real Stripe, Lemon Squeezy, or PromptPay to receive payments.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="payment-config.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <!-- SUCCESS BANNER (IF RETURNED FROM STRIPE / PAYMENT GATEWAY) -->
+  <div id="paymentSuccessBanner" class="hidden bg-emerald-950/90 border-b border-emerald-500/40 px-4 py-3 text-center text-emerald-200 text-xs sm:text-sm font-semibold">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
+      <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+      <span>🎉 <strong>Payment Confirmed!</strong> Thank you for upgrading. Your Pro features are now activated!</span>
+    </div>
+  </div>
 
   <!-- NAVBAR -->
   <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-[#070b14]/80 backdrop-blur-md">
@@ -37,9 +46,10 @@
       </nav>
 
       <div class="flex items-center space-x-3">
-        <a href="tool-table-extractor.html" class="px-4 py-2 rounded-lg text-xs font-semibold glow-btn">
-          Try Tools Free
-        </a>
+        <button id="btnOpenGatewaySettings" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-800/60 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+          <span>ตั้งค่ารับเงินจริง (Gateway)</span>
+        </button>
       </div>
     </div>
   </header>
@@ -47,9 +57,13 @@
   <!-- PRICING HEADER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-grow w-full">
     <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-800 text-xs font-semibold text-cyan-300 mb-4">
-        <i data-lucide="credit-card" class="w-3.5 h-3.5 text-cyan-400"></i> Predictable Zero-Surprise Pricing
+      
+      <!-- Live Gateway Status Pill -->
+      <div id="gatewayStatusPill" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 mb-4 cursor-pointer hover:border-cyan-500 transition">
+        <span id="gatewayStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        <span id="gatewayStatusText">โหมดทดสอบ (คลิกเพื่อเชื่อม Stripe / Lemon Squeezy รับเงินจริง)</span>
       </div>
+
       <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
         Straightforward Plans for <br>
         <span class="glow-gradient">Automated Growth & Efficiency</span>
@@ -94,7 +108,7 @@
 
         <div>
           <div class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">Pro Utility Membership</div>
-          <div class="text-3xl font-black text-white mb-1">$19 <span class="text-sm font-normal text-slate-400">/ month</span></div>
+          <div class="text-3xl font-black text-white mb-1">$19 <span class="text-sm font-normal text-slate-400">/ month (~฿690)</span></div>
           <p class="text-xs text-slate-400 mb-6">Designed for digital agencies, accountants, and growth hackers.</p>
 
           <div class="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-200">
@@ -108,7 +122,7 @@
 
         <div class="pt-8">
           <button onclick="triggerCheckout('pro_monthly', 19)" class="w-full py-3 rounded-xl text-xs font-bold glow-btn flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/30">
-            <span>Get Started with Pro</span>
+            <span>Upgrade to Pro Plan</span>
             <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -118,7 +132,7 @@
       <div class="glass-card p-8 flex flex-col justify-between">
         <div>
           <div class="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Founder Lifetime</div>
-          <div class="text-3xl font-black text-white mb-1">$99 <span class="text-sm font-normal text-slate-400">/ one-time</span></div>
+          <div class="text-3xl font-black text-white mb-1">$99 <span class="text-sm font-normal text-slate-400">/ one-time (~฿3,500)</span></div>
           <p class="text-xs text-slate-400 mb-6">Pay once, own all current & future micro-saas utilities forever.</p>
 
           <div class="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-300">
@@ -126,18 +140,60 @@
             <div class="flex items-center gap-2.5"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> All Future Utility Releases Included</div>
             <div class="flex items-center gap-2.5"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Commercial Redistribution Rights</div>
             <div class="flex items-center gap-2.5"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Self-Hostable Source Code</div>
-            <div class="flex items-center gap-2.5"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Priority Discord / Email Support</div>
+            <div class="flex items-center gap-2.5"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Priority Support</div>
           </div>
         </div>
 
         <div class="pt-8">
-          <button onclick="triggerCheckout('lifetime_all_access', 99)" class="w-full py-3 rounded-xl text-xs font-bold bg-purple-900/60 hover:bg-purple-800/80 text-purple-200 border border-purple-700 transition flex items-center justify-center gap-2">
+          <button onclick="triggerCheckout('lifetime', 99)" class="w-full py-3 rounded-xl text-xs font-bold bg-purple-900/60 hover:bg-purple-800/80 text-purple-200 border border-purple-700 transition flex items-center justify-center gap-2">
             <span>Claim Lifetime License</span>
             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </button>
         </div>
       </div>
 
+    </div>
+
+    <!-- HOW REAL PAYMENTS WORK GUIDE -->
+    <div class="glass-card p-8 mb-16 border-slate-800 max-w-5xl mx-auto">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-800 text-cyan-400 flex items-center justify-center">
+          <i data-lucide="banknote" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">วิธีเชื่อมต่อระบบรับเงินจริงเข้าบัญชีคุณ (3 นาที)</h3>
+          <p class="text-xs text-slate-400">เงินจากลูกค้าจะเข้าบัญชีธนาคารของคุณโดยตรง ไม่ผ่านคนกลาง</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300">
+        <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+            <span>1. สมัคร Stripe / Lemon Squeezy</span>
+          </div>
+          <p class="text-slate-400 leading-relaxed">
+            สมัครฟรีที่ <a href="https://stripe.com" target="_blank" class="text-cyan-400 underline">stripe.com</a> หรือ <a href="https://lemonsqueezy.com" target="_blank" class="text-cyan-400 underline">lemonsqueezy.com</a> ยืนยันตัวตนด้วยบัตร ปชช. และผูกบัญชีธนาคารไทยเพื่อรับเงิน
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+            <span>2. สร้าง Payment Link</span>
+          </div>
+          <p class="text-slate-400 leading-relaxed">
+            ในหน้า Dashboard ของ Stripe ให้กดเมนู <strong>Payment Links > New</strong> ใส่ชื่อสินค้าและราคา ($19) แล้วคัดลอกลิงก์ที่ขึ้นต้นด้วย <code class="text-cyan-300">buy.stripe.com/...</code>
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+            <span>3. วางลิงก์ในปุ่ม "ตั้งค่ารับเงินจริง"</span>
+          </div>
+          <p class="text-slate-400 leading-relaxed">
+            กดปุ่ม <button onclick="openSettingsModal()" class="text-cyan-400 underline font-semibold">ตั้งค่ารับเงินจริง</button> ด้านบน แล้ววางลิงก์ของคุณ ระบบจะเปลี่ยนเป็นรับเงินจริงทันที ลูกค้าจ่ายแล้วเงินเข้าบัญชีคุณ 100%!
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- FAQ SECTION -->
@@ -199,7 +255,9 @@
         <i data-lucide="credit-card" class="w-6 h-6"></i>
       </div>
       <h3 class="text-xl font-bold text-white mb-1" id="checkoutPlanTitle">Confirm Plan Checkout</h3>
-      <p class="text-xs text-slate-400 mb-6">Secure 256-bit encrypted simulated checkout.</p>
+      <div id="checkoutModeBadge" class="inline-block text-[11px] px-2.5 py-0.5 rounded-full mb-4 bg-amber-950/80 text-amber-300 border border-amber-800">
+        โหมดทดสอบ (ยังไม่ได้ใส่ลิงก์ Stripe)
+      </div>
       
       <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 mb-6 text-left">
         <div class="flex justify-between items-center mb-2">
@@ -211,15 +269,88 @@
           <span class="text-sm font-black text-cyan-400" id="checkoutPlanAmount">$19.00</span>
         </div>
         <div class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800">
-          Includes instant license key generation and access to private webhook relay servers.
+          Instant license key generation & access to high-velocity utility servers.
         </div>
       </div>
 
+      <!-- MAIN ACTION BUTTON (REDIRECTS TO STRIPE IF CONFIGURED, OR RUNS DEMO) -->
       <button id="btnExecuteCheckout" class="w-full py-3 rounded-xl text-sm font-bold glow-btn mb-3 flex items-center justify-center gap-2">
         <i data-lucide="lock" class="w-4 h-4"></i>
-        <span>Pay with Stripe / Lemon Squeezy</span>
+        <span id="btnExecuteCheckoutText">Pay with Stripe / Lemon Squeezy</span>
       </button>
-      <p class="text-[10px] text-slate-500">Instant digital activation. Safe sandbox test.</p>
+
+      <!-- SETUP REAL LINK SHORTCUT BUTTON -->
+      <button onclick="openSettingsModal()" class="w-full py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center justify-center gap-1.5">
+        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+        <span>ตั้งค่าลิงก์รับเงินจริงของคุณ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- GATEWAY SETTINGS MODAL (FOR USER TO PASTE REAL STRIPE / LEMON SQUEEZY LINKS) -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border-cyan-500/40 text-left relative max-h-[90vh] overflow-y-auto">
+      <button id="btnCloseSettings" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white">
+          <i data-lucide="sliders" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">เชื่อมต่อระบบรับเงินจริง (Payment Gateway)</h3>
+          <p class="text-xs text-slate-400">ใส่ Payment Link จาก Stripe หรือ Lemon Squeezy เพื่อรับเงินเข้าบัญชีคุณ</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">
+            1. Stripe Payment Link สำหรับ Pro Monthly ($19)
+          </label>
+          <input type="url" id="inputProLink" placeholder="https://buy.stripe.com/..." 
+            class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500">
+          <span class="text-[10px] text-slate-500">สร้างจาก Stripe Dashboard > Payment Links > ตั้งราคา $19 (หรือ 690 บาท)</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">
+            2. Stripe Payment Link สำหรับ B2B Lead Dataset ($29)
+          </label>
+          <input type="url" id="inputLeadsLink" placeholder="https://buy.stripe.com/..." 
+            class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500">
+          <span class="text-[10px] text-slate-500">สำหรับปลดล็อกข้อมูล 480+ รายชื่อใน LeadPulse B2B</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">
+            3. Stripe Payment Link สำหรับ Founder Lifetime ($99)
+          </label>
+          <input type="url" id="inputLifetimeLink" placeholder="https://buy.stripe.com/..." 
+            class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500">
+          <span class="text-[10px] text-slate-500">สำหรับผู้ซื้อแบบจ่ายครั้งเดียวตลอดชีพ</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">
+            4. PromptPay ID (เบอร์โทร หรือ เลขประจำตัวผู้เสียภาษี สำหรับรับเงินไทย)
+          </label>
+          <input type="text" id="inputPromptPay" placeholder="08x-xxx-xxxx หรือ เลข ปชช." 
+            class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-300 font-mono focus:outline-none focus:border-cyan-500">
+          <span class="text-[10px] text-slate-500">สำหรับการโอนตรงผ่านธนาคารไทย</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="btnSaveGatewaySettings" class="flex-1 py-2.5 rounded-xl text-xs font-bold glow-btn flex items-center justify-center gap-2">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>บันทึกการเชื่อมต่อ (Save & Activate)</span>
+        </button>
+        <button id="btnClearGatewaySettings" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 transition">
+          รีเซ็ต
+        </button>
+      </div>
     </div>
   </div>
 
@@ -228,7 +359,7 @@
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-2">
         <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-        <span class="text-slate-400">OmniTools SaaS • 24/7 Digital Utility Machine</span>
+        <span class="text-slate-400">OmniTools SaaS • Real Payment Gateway Integrated</span>
       </div>
       <div class="flex space-x-6 text-slate-400">
         <a href="tool-table-extractor.html" class="hover:text-cyan-400">Bank to Excel</a>
@@ -250,6 +381,45 @@
     const checkoutPlanName = document.getElementById('checkoutPlanName');
     const checkoutPlanAmount = document.getElementById('checkoutPlanAmount');
     const btnExecuteCheckout = document.getElementById('btnExecuteCheckout');
+    const btnExecuteCheckoutText = document.getElementById('btnExecuteCheckoutText');
+    const checkoutModeBadge = document.getElementById('checkoutModeBadge');
+
+    const settingsModal = document.getElementById('settingsModal');
+    const btnOpenGatewaySettings = document.getElementById('btnOpenGatewaySettings');
+    const btnCloseSettings = document.getElementById('btnCloseSettings');
+    const btnSaveGatewaySettings = document.getElementById('btnSaveGatewaySettings');
+    const btnClearGatewaySettings = document.getElementById('btnClearGatewaySettings');
+
+    const inputProLink = document.getElementById('inputProLink');
+    const inputLeadsLink = document.getElementById('inputLeadsLink');
+    const inputLifetimeLink = document.getElementById('inputLifetimeLink');
+    const inputPromptPay = document.getElementById('inputPromptPay');
+
+    const gatewayStatusPill = document.getElementById('gatewayStatusPill');
+    const gatewayStatusDot = document.getElementById('gatewayStatusDot');
+    const gatewayStatusText = document.getElementById('gatewayStatusText');
+    const paymentSuccessBanner = document.getElementById('paymentSuccessBanner');
+
+    // Check URL parameters for successful return
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success' || urlParams.get('session_id')) {
+      paymentSuccessBanner.classList.remove('hidden');
+      localStorage.setItem('omni_license_active', 'PRO_UNLOCKED');
+    }
+
+    // Refresh Gateway Status UI
+    function refreshGatewayStatus() {
+      const activeLink = PAYMENT_CONFIG.getCheckoutUrl('pro_monthly');
+      if (activeLink) {
+        gatewayStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        gatewayStatusText.innerHTML = '<strong class="text-emerald-300">ระบบรับเงินจริงพร้อมทำงาน:</strong> เชื่อม Stripe เรียบร้อย';
+        gatewayStatusPill.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-700 text-xs font-semibold text-emerald-200 mb-4 cursor-pointer hover:border-emerald-400 transition';
+      } else {
+        gatewayStatusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+        gatewayStatusText.innerHTML = 'โหมดทดสอบ (คลิกเพื่อใส่ลิงก์ Stripe รับเงินจริง)';
+        gatewayStatusPill.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 mb-4 cursor-pointer hover:border-cyan-500 transition';
+      }
+    }
 
     window.triggerCheckout = function(plan, amount) {
       selectedPlan = plan;
@@ -263,6 +433,17 @@
         checkoutPlanAmount.textContent = '$99.00 USD';
       }
 
+      const liveUrl = PAYMENT_CONFIG.getCheckoutUrl(selectedPlan);
+      if (liveUrl) {
+        checkoutModeBadge.className = 'inline-block text-[11px] px-2.5 py-0.5 rounded-full mb-4 bg-emerald-950 text-emerald-300 border border-emerald-800';
+        checkoutModeBadge.textContent = '🟢 ระบบรับเงินจริงพร้อม (Stripe Checkout)';
+        btnExecuteCheckoutText.textContent = 'จ่ายเงินจริงผ่าน Stripe / บัตรเครดิต';
+      } else {
+        checkoutModeBadge.className = 'inline-block text-[11px] px-2.5 py-0.5 rounded-full mb-4 bg-amber-950 text-amber-300 border border-amber-800';
+        checkoutModeBadge.textContent = '🟡 โหมดทดสอบ (คลิกปุ่มตั้งค่าด้านล่างเพื่อใส่ลิงก์จริง)';
+        btnExecuteCheckoutText.textContent = 'ทดสอบระบบชำระเงิน (Sandbox Test)';
+      }
+
       checkoutModal.classList.remove('hidden');
       checkoutModal.classList.add('flex');
     };
@@ -273,6 +454,17 @@
     });
 
     btnExecuteCheckout.addEventListener('click', async () => {
+      const liveUrl = PAYMENT_CONFIG.getCheckoutUrl(selectedPlan);
+
+      if (liveUrl) {
+        // REDIRECT TO REAL PAYMENT GATEWAY
+        btnExecuteCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังเปิดหน้าชำระเงิน Stripe...`;
+        lucide.createIcons();
+        window.location.href = liveUrl;
+        return;
+      }
+
+      // Simulation mode
       btnExecuteCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Order...`;
       lucide.createIcons();
 
@@ -283,17 +475,76 @@
           body: JSON.stringify({ plan: selectedPlan, amount: selectedAmount })
         });
         const data = await res.json();
-        alert(`🎉 Payment Successful!\n\nOrder Ref: ${data.orderId}\nLicense: ${data.details.unlockedToken}\nPlan: ${data.details.plan}\n\nYour account has been upgraded!`);
+        alert(`🎉 จำลองคำสั่งซื้อสำเร็จ!\n\nOrder Ref: ${data.orderId}\nLicense: ${data.details.unlockedToken}\n\n*หมายเหตุ: หากต้องการรับเงินจริง ให้คลิกปุ่ม "ตั้งค่ารับเงินจริง" เพื่อใส่ลิงก์ Stripe หรือ Lemon Squeezy ของคุณครับ*`);
         checkoutModal.classList.add('hidden');
         checkoutModal.classList.remove('flex');
       } catch (e) {
-        alert('Order simulated: License UNLOCK_TEST_PASS activated.');
+        alert('จำลองการเปิดสิทธิ์สำเร็จ! หากต้องการรับเงินจริง ให้ใส่ลิงก์ Stripe ที่ปุ่มตั้งค่า');
         checkoutModal.classList.add('hidden');
         checkoutModal.classList.remove('flex');
       } finally {
-        btnExecuteCheckout.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> <span>Pay with Stripe / Lemon Squeezy</span>`;
+        btnExecuteCheckout.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> <span id="btnExecuteCheckoutText">${btnExecuteCheckoutText.textContent}</span>`;
         lucide.createIcons();
       }
+    });
+
+    // Settings Modal Handlers
+    window.openSettingsModal = function() {
+      // Load current settings
+      try {
+        const saved = localStorage.getItem('omni_payment_settings');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          inputProLink.value = parsed.links?.pro_monthly || '';
+          inputLeadsLink.value = parsed.links?.leads_dataset || '';
+          inputLifetimeLink.value = parsed.links?.lifetime || '';
+          inputPromptPay.value = parsed.promptPay || '';
+        }
+      } catch (e) {}
+
+      settingsModal.classList.remove('hidden');
+      settingsModal.classList.add('flex');
+    };
+
+    btnOpenGatewaySettings.addEventListener('click', openSettingsModal);
+    gatewayStatusPill.addEventListener('click', openSettingsModal);
+
+    btnCloseSettings.addEventListener('click', () => {
+      settingsModal.classList.add('hidden');
+      settingsModal.classList.remove('flex');
+    });
+
+    btnSaveGatewaySettings.addEventListener('click', () => {
+      const settings = {
+        links: {
+          pro_monthly: inputProLink.value.trim(),
+          leads_dataset: inputLeadsLink.value.trim(),
+          lifetime: inputLifetimeLink.value.trim()
+        },
+        promptPay: inputPromptPay.value.trim()
+      };
+
+      localStorage.setItem('omni_payment_settings', JSON.stringify(settings));
+      alert('✅ บันทึกการเชื่อมต่อเรียบร้อย! ระบบจะส่งลูกค้าไปที่หน้าชำระเงินจริงของคุณทันทีเมื่อมีคนกดซื้อ');
+      settingsModal.classList.add('hidden');
+      settingsModal.classList.remove('flex');
+      refreshGatewayStatus();
+    });
+
+    btnClearGatewaySettings.addEventListener('click', () => {
+      if (confirm('คุณต้องการรีเซ็ตการตั้งค่าเป็นโหมดทดสอบใช่หรือไม่?')) {
+        localStorage.removeItem('omni_payment_settings');
+        inputProLink.value = '';
+        inputLeadsLink.value = '';
+        inputLifetimeLink.value = '';
+        inputPromptPay.value = '';
+        refreshGatewayStatus();
+        alert('รีเซ็ตเป็นโหมดทดสอบเรียบร้อย');
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshGatewayStatus();
     });
   </script>
 </body>

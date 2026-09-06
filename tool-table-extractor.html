@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="payment-config.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
@@ -573,6 +574,14 @@
     });
 
     btnMockCheckout.addEventListener('click', async () => {
+      const liveUrl = PAYMENT_CONFIG.getCheckoutUrl('pro_monthly');
+      if (liveUrl) {
+        btnMockCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังเปิดหน้าชำระเงิน Stripe...`;
+        lucide.createIcons();
+        window.location.href = liveUrl;
+        return;
+      }
+
       btnMockCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Checkout...`;
       lucide.createIcons();
 
@@ -583,11 +592,11 @@
           body: JSON.stringify({ plan: 'pro_monthly', amount: 19 })
         });
         const data = await res.json();
-        alert('🎉 Payment Successful!\nOrder ID: ' + data.orderId + '\nPro features unlocked.');
+        alert('🎉 การชำระเงินจำลองสำเร็จ!\nOrder ID: ' + data.orderId + '\nเปิดสิทธิ์ Pro เรียบร้อย\n\n*หากต้องการรับเงินจริง ให้ไปที่หน้า Pricing เพื่อใส่ลิงก์ Stripe ของคุณ*');
         upgradeModal.classList.add('hidden');
         upgradeModal.classList.remove('flex');
       } catch (e) {
-        alert('Order simulated: Pro account active!');
+        alert('เปิดสิทธิ์ทดสอบเรียบร้อย! สามารถใส่ลิงก์ Stripe จริงได้ที่หน้า Pricing');
         upgradeModal.classList.add('hidden');
         upgradeModal.classList.remove('flex');
       } finally {
