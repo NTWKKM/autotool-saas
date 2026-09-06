@@ -589,38 +589,6 @@
       });
     }
 
-    btnMockCheckout.addEventListener('click', async () => {
-      const liveUrl = PAYMENT_CONFIG.getCheckoutUrl('pro_monthly');
-      if (liveUrl) {
-        btnMockCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังเปิดหน้าชำระเงิน Stripe...`;
-        lucide.createIcons();
-        window.location.href = liveUrl;
-        return;
-      }
-
-      btnMockCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Checkout...`;
-      lucide.createIcons();
-
-      try {
-        const res = await fetch('/api/checkout/mock', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: 'pro_monthly', amount: 19 })
-        });
-        const data = await res.json();
-        alert('🎉 การชำระเงินจำลองสำเร็จ!\nOrder ID: ' + data.orderId + '\nเปิดสิทธิ์ Pro เรียบร้อย\n\n*หากต้องการรับเงินจริง ให้ไปที่หน้า Pricing เพื่อใส่ลิงก์ Stripe ของคุณ*');
-        upgradeModal.classList.add('hidden');
-        upgradeModal.classList.remove('flex');
-      } catch (e) {
-        alert('เปิดสิทธิ์ทดสอบเรียบร้อย! สามารถใส่ลิงก์ Stripe จริงได้ที่หน้า Pricing');
-        upgradeModal.classList.add('hidden');
-        upgradeModal.classList.remove('flex');
-      } finally {
-        btnMockCheckout.innerHTML = `<span>Upgrade with Instant Activation</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-        lucide.createIcons();
-      }
-    });
-
     // Auto load sample on first page load
     window.addEventListener('DOMContentLoaded', () => {
       btnSampleKbank.click();
