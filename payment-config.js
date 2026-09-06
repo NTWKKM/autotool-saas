@@ -1,38 +1,43 @@
 /**
  * OmniTools SaaS — Payment Gateway Configuration
  * 
- * To accept REAL payments from customers into your bank account:
- * 1. Create a Payment Link in Stripe (https://dashboard.stripe.com/payment-links)
- *    OR in Lemon Squeezy (https://app.lemonsqueezy.com/products)
- * 2. Paste your live checkout links below, or configure them via the UI Settings modal!
+ * Configured with Buy Me a Coffee: https://www.buymeacoffee.com/ntwkkm
+ * Real payments accepted via Credit Card, Apple Pay, Google Pay!
  */
 
 const PAYMENT_CONFIG = {
-  // Live Gateway Provider: 'stripe' | 'lemonsqueezy' | 'promptpay' | 'mock'
-  defaultProvider: 'stripe',
+  // Primary Gateway: 'buymeacoffee' | 'stripe' | 'lemonsqueezy' | 'promptpay'
+  defaultProvider: 'buymeacoffee',
 
-  // Stripe Payment Links (Zero backend required, hosted checkout)
+  // Buy Me a Coffee — Instant Live Real Payment (Direct to ntwkkm)
+  buyMeACoffee: {
+    username: 'ntwkkm',
+    url: 'https://www.buymeacoffee.com/ntwkkm',
+    badgeText: 'Pay with Buy Me a Coffee'
+  },
+
+  // Stripe Payment Links (Optional overrides)
   stripe: {
-    pro_monthly: '',     // e.g. 'https://buy.stripe.com/live_xxx'
-    leads_dataset: '',   // e.g. 'https://buy.stripe.com/live_yyy'
-    lifetime: ''         // e.g. 'https://buy.stripe.com/live_zzz'
+    pro_monthly: '',
+    leads_dataset: '',
+    lifetime: ''
   },
 
-  // Lemon Squeezy Checkout Links (Merchant of Record, global taxes handled)
+  // Lemon Squeezy (Optional overrides)
   lemonSqueezy: {
-    pro_monthly: '',     // e.g. 'https://yourstore.lemonsqueezy.com/buy/variant-1'
-    leads_dataset: '',   // e.g. 'https://yourstore.lemonsqueezy.com/buy/variant-2'
-    lifetime: ''         // e.g. 'https://yourstore.lemonsqueezy.com/buy/variant-3'
+    pro_monthly: '',
+    leads_dataset: '',
+    lifetime: ''
   },
 
-  // PromptPay Settings (For direct Thai Bank Transfer)
+  // PromptPay Settings
   promptPay: {
     enabled: true,
-    recipientName: 'OmniTools Payments',
-    accountNumber: '', // PromptPay ID (Phone or Tax ID)
+    recipientName: 'NTWKKM',
+    accountNumber: ''
   },
 
-  // Returns the active checkout link (checks localStorage overrides first)
+  // Returns the active checkout link (checks localStorage overrides, then BMC)
   getCheckoutUrl(planId) {
     try {
       const saved = localStorage.getItem('omni_payment_settings');
@@ -44,17 +49,19 @@ const PAYMENT_CONFIG = {
       }
     } catch (e) {}
 
-    // Fallback to coded configuration
+    // Check custom stripe / lemon squeezy overrides
     if (this.stripe[planId] && this.stripe[planId].startsWith('http')) {
       return this.stripe[planId];
     }
     if (this.lemonSqueezy[planId] && this.lemonSqueezy[planId].startsWith('http')) {
       return this.lemonSqueezy[planId];
     }
-    return null;
+
+    // Default primary: Real payment via Buy Me a Coffee!
+    return this.buyMeACoffee.url;
   },
 
-  // Check if real live payment is active
+  // Real live payment is always active via Buy Me a Coffee
   isLivePaymentActive(planId) {
     return Boolean(this.getCheckoutUrl(planId));
   }

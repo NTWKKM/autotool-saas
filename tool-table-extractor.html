@@ -251,11 +251,15 @@
           <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> REST API Key for automatic accounting sync</li>
         </ul>
       </div>
-      <button id="btnMockCheckout" class="w-full py-3 rounded-xl text-sm font-bold glow-btn mb-3 flex items-center justify-center gap-2">
-        <span>Upgrade with Instant Activation</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      <a href="https://www.buymeacoffee.com/ntwkkm" target="_blank" class="w-full py-3 rounded-xl text-sm font-bold bg-[#FFDD00] hover:bg-[#ffe536] text-slate-900 transition flex items-center justify-center gap-2 mb-2 shadow-lg shadow-amber-500/20">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 760 1100"><path d="M115.3 430.3c0 74.3 60.2 134.5 134.5 134.5h260.4c74.3 0 134.5-60.2 134.5-134.5V115.3c0-63.7-51.6-115.3-115.3-115.3H230.6C166.9 0 115.3 51.6 115.3 115.3v315z"/><path d="M510.2 564.8H249.8c-74.3 0-134.5-60.2-134.5-134.5V115.3C115.3 51.6 166.9 0 230.6 0h298.8c63.7 0 115.3 51.6 115.3 115.3v315c0 74.3-60.2 134.5-134.5 134.5zM230.6 60c-30.5 0-55.3 24.8-55.3 55.3v315c0 41.1 33.4 74.5 74.5 74.5h260.4c41.1 0 74.5-33.4 74.5-74.5V115.3c0-30.5-24.8-55.3-55.3-55.3H230.6z"/><path d="M510.2 645H249.8C137.7 645 46.5 553.8 46.5 441.7V115.3C46.5 24.8 120 0 211.3 0h337.4c91.3 0 164.8 24.8 164.8 115.3v326.4c0 112.1-91.2 203.3-203.3 203.3zm-260.4-60h260.4c79 0 143.3-64.3 143.3-143.3V115.3c0-42.9-39.7-55.3-104.8-55.3H211.3c-65.1 0-104.8 12.4-104.8 55.3V441.7c0 79 64.3 143.3 143.3 143.3z"/></svg>
+        <span>จ่ายเงินจริงผ่าน buymeacoffee.com/ntwkkm ($19)</span>
+      </a>
+      <button id="btnUnlockDocTable" class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-md">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span>ฉันชำระเงินแล้ว (เปิดสิทธิ์ Pro ทันที)</span>
       </button>
-      <p class="text-[10px] text-slate-500">Simulated Instant Checkout via Lemon Squeezy / Stripe Sandbox</p>
+      <p class="text-[10px] text-slate-500 mt-2">รับบัตรเครดิต, เดบิต, Apple Pay, Google Pay</p>
     </div>
   </div>
 
@@ -539,8 +543,9 @@
         return;
       }
 
-      // Check if dataset is large (demo paywall trigger)
-      if (currentTableData.length > 20) {
+      // Check if dataset is large and not Pro
+      const isPro = localStorage.getItem('omni_license_active') === 'PRO_UNLOCKED';
+      if (!isPro && currentTableData.length > 20) {
         upgradeModal.classList.remove('hidden');
         upgradeModal.classList.add('flex');
         return;
@@ -572,6 +577,17 @@
       upgradeModal.classList.add('hidden');
       upgradeModal.classList.remove('flex');
     });
+
+    const btnUnlockDocTable = document.getElementById('btnUnlockDocTable');
+    if (btnUnlockDocTable) {
+      btnUnlockDocTable.addEventListener('click', () => {
+        localStorage.setItem('omni_license_active', 'PRO_UNLOCKED');
+        alert('🎉 ยืนยันการชำระเงินเรียบร้อย!\n\nขอบคุณสำหรับการสนับสนุนผ่าน buymeacoffee.com/ntwkkm\nระบบปลดล็อกการแปลงไฟล์ไม่จำกัดหน้าเรียบร้อยแล้วครับ');
+        upgradeModal.classList.add('hidden');
+        upgradeModal.classList.remove('flex');
+        btnExportXLSX.click();
+      });
+    }
 
     btnMockCheckout.addEventListener('click', async () => {
       const liveUrl = PAYMENT_CONFIG.getCheckoutUrl('pro_monthly');
