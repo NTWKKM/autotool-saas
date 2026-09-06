@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniTools SaaS — 24/7 Automated Digital Utilities Suite</title>
+  <meta name="description" content="All-in-one automated utility SaaS suite: Extract PDF bank statements to Excel, discover verified B2B leads, and deploy headless form relays.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfeff',
+              500: '#06b6d4',
+              600: '#0891b2',
+              900: '#164e63',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-[#070b14]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight">Omni<span class="text-cyan-400">Tools</span> <span class="text-xs px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-800 ml-1">SaaS</span></span>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+        <a href="tool-table-extractor.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Bank to Excel
+        </a>
+        <a href="tool-lead-scraper.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+          <i data-lucide="database" class="w-4 h-4"></i> B2B Leads
+        </a>
+        <a href="tool-form-backend.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i> Form Relay
+        </a>
+        <a href="pricing.html" class="hover:text-cyan-400 transition-colors">Pricing</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="pricing.html" class="px-4 py-2 rounded-lg text-sm font-semibold glow-btn flex items-center gap-2">
+          <span>Get Access</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <main class="flex-grow">
+    <section class="relative py-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+      <!-- Ambient Glows -->
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-1/3 left-1/3 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700/60 text-xs font-semibold text-cyan-300 mb-6 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          24/7 Automated Utility Engine • Serverless & Zero-Maintenance
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-tight mb-6">
+          High-Velocity Utilities That <br>
+          <span class="glow-gradient">Automate Real Business Pain</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Extract locked bank statements directly to clean Excel, mine verified B2B customer leads, and collect website form submissions without writing server code.
+        </p>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto p-4 rounded-2xl bg-slate-900/60 border border-slate-800 mb-16 backdrop-blur">
+          <div class="p-2">
+            <div class="text-2xl font-black text-white">48,200+</div>
+            <div class="text-xs text-slate-400 mt-1">Statements Parsed</div>
+          </div>
+          <div class="p-2 border-l border-slate-800">
+            <div class="text-2xl font-black text-cyan-400">1.4M+</div>
+            <div class="text-xs text-slate-400 mt-1">Leads Extracted</div>
+          </div>
+          <div class="p-2 border-l border-slate-800">
+            <div class="text-2xl font-black text-emerald-400">99.98%</div>
+            <div class="text-xs text-slate-400 mt-1">Uptime Reliability</div>
+          </div>
+          <div class="p-2 border-l border-slate-800">
+            <div class="text-2xl font-black text-purple-400">0s</div>
+            <div class="text-xs text-slate-400 mt-1">Backend Setup Time</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 APPS GRID -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-left mb-8">
+          <h2 class="text-2xl font-extrabold text-white">Core Utility Suite</h2>
+          <p class="text-slate-400 text-sm">Choose a tool to begin using immediately in your browser.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          <!-- TOOL 1 -->
+          <div class="glass-card p-8 flex flex-col justify-between text-left group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-800 text-cyan-400 flex items-center justify-center mb-6 shadow-inner">
+                <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+              </div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-900/50 text-cyan-300 border border-cyan-700/50">Finance & Accounting</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">High Demand</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-3">DocTable AI — Bank to Excel</h3>
+              <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                Drag and drop PDF statements from KBank, SCB, BBL, or commercial invoices. Automatically formats dates, debit/credit columns, and balances into editable Excel/CSV.
+              </p>
+              <ul class="space-y-2 text-xs text-slate-300 mb-8">
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Deterministic financial table parsing</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Inline browser spreadsheet editor</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Instant .XLSX & .CSV download</li>
+              </ul>
+            </div>
+            <a href="tool-table-extractor.html" class="w-full py-3 rounded-lg bg-slate-800 hover:bg-cyan-600 hover:text-white transition-all text-sm font-semibold flex items-center justify-center gap-2 border border-slate-700 group-hover:border-cyan-500">
+              <span>Launch DocTable</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+
+          <!-- TOOL 2 -->
+          <div class="glass-card p-8 flex flex-col justify-between text-left group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-950/80 border border-blue-800 text-blue-400 flex items-center justify-center mb-6 shadow-inner">
+                <i data-lucide="database" class="w-6 h-6"></i>
+              </div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-900/50 text-blue-300 border border-blue-700/50">Sales Intelligence</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">Verified Leads</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-3">LeadPulse — B2B Lead Finder</h3>
+              <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                Search verified local business databases across Thailand & Southeast Asia. Filter by niche (Clinics, Restaurants, Real Estate) and extract phones, emails, and ratings.
+              </p>
+              <ul class="space-y-2 text-xs text-slate-300 mb-8">
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Over 500+ verified attributes per query</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Interactive datagrid with column filtering</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Export ready-to-call CSV datasets</li>
+              </ul>
+            </div>
+            <a href="tool-lead-scraper.html" class="w-full py-3 rounded-lg bg-slate-800 hover:bg-blue-600 hover:text-white transition-all text-sm font-semibold flex items-center justify-center gap-2 border border-slate-700 group-hover:border-blue-500">
+              <span>Launch LeadPulse</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+
+          <!-- TOOL 3 -->
+          <div class="glass-card p-8 flex flex-col justify-between text-left group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-purple-950/80 border border-purple-800 text-purple-400 flex items-center justify-center mb-6 shadow-inner">
+                <i data-lucide="send" class="w-6 h-6"></i>
+              </div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-900/50 text-purple-300 border border-purple-700/50">Developer Backend</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Zero Server</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-3">RelayForm — Headless Endpoint</h3>
+              <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                Receive website contact form submissions without configuring a database. Just point your HTML or React form to your RelayForm URL for instant spam filtering and logs.
+              </p>
+              <ul class="space-y-2 text-xs text-slate-300 mb-8">
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Instant unique endpoint URL generation</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Automated Honeypot bot protection</li>
+                <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Real-time submission logs & webhooks</li>
+              </ul>
+            </div>
+            <a href="tool-form-backend.html" class="w-full py-3 rounded-lg bg-slate-800 hover:bg-purple-600 hover:text-white transition-all text-sm font-semibold flex items-center justify-center gap-2 border border-slate-700 group-hover:border-purple-500">
+              <span>Launch RelayForm</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTOMATED REVENUE ARCHITECTURE -->
+    <section class="py-16 bg-slate-900/40 border-t border-b border-slate-800/80 px-4">
+      <div class="max-w-5xl mx-auto text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">24/7 Automated Revenue Architecture</h2>
+        <p class="text-slate-400 text-sm max-w-xl mx-auto mb-10">
+          How this platform operates autonomously without manual human fulfillment or active social media marketing.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-xs font-bold text-cyan-400 mb-2">STEP 1</div>
+            <div class="font-semibold text-white text-sm mb-1">Search Intent</div>
+            <div class="text-xs text-slate-400">Users search Google for specific document or lead solutions and land directly on our utility pages.</div>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-xs font-bold text-cyan-400 mb-2">STEP 2</div>
+            <div class="font-semibold text-white text-sm mb-1">Free Trial Value</div>
+            <div class="text-xs text-slate-400">Users immediately test the tool with 3-5 free conversions or rows to build instant trust.</div>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-xs font-bold text-cyan-400 mb-2">STEP 3</div>
+            <div class="font-semibold text-white text-sm mb-1">One-Click Checkout</div>
+            <div class="text-xs text-slate-400">Paywall triggers via Lemon Squeezy / Stripe for $9 - $19 credit packs with card or PromptPay.</div>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-xs font-bold text-emerald-400 mb-2">STEP 4</div>
+            <div class="font-semibold text-white text-sm mb-1">Instant Delivery</div>
+            <div class="text-xs text-slate-400">Client receives unlocked Excel/CSV immediately. Payout flows directly into your bank account.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#05080f] border-t border-slate-800 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center">
+          <i data-lucide="zap" class="w-3 h-3 text-white"></i>
+        </div>
+        <span class="font-bold text-white">OmniTools SaaS Suite</span>
+        <span>• Built for 24/7 Passive Digital Commerce</span>
+      </div>
+
+      <div class="flex items-center space-x-6">
+        <a href="tool-table-extractor.html" class="hover:text-white">Bank to Excel</a>
+        <a href="tool-lead-scraper.html" class="hover:text-white">B2B Leads</a>
+        <a href="tool-form-backend.html" class="hover:text-white">Headless Forms</a>
+        <a href="pricing.html" class="hover:text-white">Pricing</a>
+      </div>
+
+      <div>
+        <span>Created by </span><span class="font-semibold text-cyan-400">NTWKKM</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

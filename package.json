@@ -1,0 +1,23 @@
+{
+  "name": "autotool-saas",
+  "version": "1.0.0",
+  "description": "3-in-1 24/7 Automated Utility Micro-SaaS Suite for Passive Revenue (Bank Statement Extractor, B2B Lead Finder, Headless Form Relay)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "micro-saas",
+    "utility-tools",
+    "bank-statement-to-excel",
+    "b2b-lead-scraper",
+    "headless-form-backend",
+    "passive-income",
+    "lemon-squeezy",
+    "stripe"
+  ],
+  "author": "NTWKKM",
+  "license": "MIT"
+}

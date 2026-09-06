@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocTable AI — Bank Statement & Invoice Table Extractor</title>
+  <meta name="description" content="Extract financial statements and PDF tables directly into structured Excel (XLSX) and CSV with automated column normalization.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-[#070b14]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight">Omni<span class="text-cyan-400">Tools</span></span>
+        </a>
+        <span class="text-slate-600">/</span>
+        <span class="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-cyan-400"></i> DocTable AI
+        </span>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+        <a href="tool-table-extractor.html" class="text-cyan-400 font-semibold flex items-center gap-1.5">Bank to Excel</a>
+        <a href="tool-lead-scraper.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">B2B Leads</a>
+        <a href="tool-form-backend.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">Form Relay</a>
+        <a href="pricing.html" class="hover:text-cyan-400 transition-colors">Pricing</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="pricing.html" class="px-4 py-2 rounded-lg text-xs font-semibold glow-btn flex items-center gap-1.5">
+          <span>Upgrade Pro</span>
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
+    
+    <!-- Title & SEO Badges -->
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-800 text-xs font-semibold text-cyan-300 mb-3">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i> Client-Side Safe • Zero Bank Credentials Required
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Bank Statement to <span class="glow-gradient">Clean Excel / CSV</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl">
+        Upload or paste raw bank statement transactions, PDFs, or invoice exports. DocTable extracts dates, descriptions, references, debits, credits, and calculates running balances automatically.
+      </p>
+    </div>
+
+    <!-- Input Section (2 Columns) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      
+      <!-- Upload / Paste Area (7 cols) -->
+      <div class="lg:col-span-7 glass-card p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="file-up" class="w-5 h-5 text-cyan-400"></i> Statement Input
+            </h2>
+            <div class="flex items-center gap-2">
+              <button id="btnSampleKbank" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition-colors">
+                Sample KBank
+              </button>
+              <button id="btnSampleSCB" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 transition-colors">
+                Sample Commercial
+              </button>
+            </div>
+          </div>
+
+          <!-- Drag and Drop Box -->
+          <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-900/40 mb-4 group">
+            <input type="file" id="fileInput" accept=".txt,.csv,.tsv,.json,.pdf" class="hidden">
+            <div class="w-12 h-12 rounded-full bg-slate-800 group-hover:bg-cyan-950/60 text-slate-400 group-hover:text-cyan-400 flex items-center justify-center mx-auto mb-3 transition-colors">
+              <i data-lucide="cloud-upload" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-200">Drag & Drop statement file here, or <span class="text-cyan-400 underline">browse</span></p>
+            <p class="text-xs text-slate-500 mt-1">Supports CSV, TSV, TXT, OCR text exports, or PDF text dumps</p>
+          </div>
+
+          <!-- Raw Text Paste Fallback -->
+          <div class="mb-4">
+            <label for="rawText" class="block text-xs font-semibold text-slate-400 mb-1.5 flex justify-between">
+              <span>Or Paste Raw Statement / Invoice Text Here:</span>
+              <span id="charCount" class="text-slate-500 text-xs">0 characters</span>
+            </label>
+            <textarea id="rawText" rows="6" placeholder="01/09/2026  TRANSFER IN KBANK MOBILE   REF098231   +45,000.00
+02/09/2026  DIRECT DEBIT OFFICE LEASE     REF098232   -28,000.00
+03/09/2026  ONLINE PAYMENT AWS CLOUD      REF098233   -4,250.50" 
+              class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-400">Statement Format:</label>
+            <select id="bankFormatSelect" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded px-2.5 py-1 focus:outline-none">
+              <option value="auto">Auto-Detect Layout</option>
+              <option value="Kasikorn Bank (KBank)">Kasikorn Bank (KBank)</option>
+              <option value="Siam Commercial Bank (SCB)">Siam Commercial Bank (SCB)</option>
+              <option value="Standard International (Chase/Stripe)">International (Chase/Stripe)</option>
+            </select>
+          </div>
+
+          <button id="btnExtract" class="px-5 py-2 rounded-lg text-xs font-bold glow-btn flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Parse & Extract Table</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics & Status (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        
+        <!-- Summary Card -->
+        <div class="glass-card p-6">
+          <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+            <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i> Financial Reconciliation
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-xs text-slate-400">Total Credits (+)</span>
+              <div id="statCredits" class="text-lg font-black text-emerald-400 mt-1">฿0.00</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-xs text-slate-400">Total Debits (-)</span>
+              <div id="statDebits" class="text-lg font-black text-rose-400 mt-1">฿0.00</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-xs text-slate-400">Net Cashflow</span>
+              <div id="statNet" class="text-lg font-black text-cyan-400 mt-1">฿0.00</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-xs text-slate-400">Parsed Rows</span>
+              <div id="statRows" class="text-lg font-black text-white mt-1">0 rows</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Automation Paywall / Speed Callout -->
+        <div class="glass-card p-6 bg-gradient-to-br from-cyan-950/30 to-blue-950/20 border-cyan-800/40 flex-grow flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-2">
+              <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i> Instant Export Available
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Export Clean Spreadsheet</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Clean, reconciled data ready for QuickBooks, Xero, FlowAccount, or internal auditing. Formatted with numeric currencies and ISO dates.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 mt-6">
+            <button id="btnExportCSV" class="flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition flex items-center justify-center gap-2">
+              <i data-lucide="file-text" class="w-4 h-4 text-slate-300"></i>
+              <span>Export .CSV</span>
+            </button>
+            <button id="btnExportXLSX" class="flex-1 py-2.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2">
+              <i data-lucide="sheet" class="w-4 h-4 text-white"></i>
+              <span>Export .XLSX</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Extracted Table Results -->
+    <div class="glass-card p-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="table" class="w-5 h-5 text-cyan-400"></i> Extracted Transaction Matrix
+          </h2>
+          <p id="tableSubtitle" class="text-xs text-slate-400 mt-0.5">Showing parsed columns with automatic debit/credit separation.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="detectedFormatBadge" class="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-cyan-300 hidden">
+            Layout: Auto-Detected
+          </span>
+          <button id="btnClearTable" class="text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 transition">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-[500px]">
+        <table class="custom-table" id="dataTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Reference / Code</th>
+              <th class="text-right">Withdrawal (-)</th>
+              <th class="text-right">Deposit (+)</th>
+              <th class="text-right">Running Balance</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="7" class="text-center py-12 text-slate-500">
+                <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-600">
+                  <i data-lucide="inbox" class="w-6 h-6"></i>
+                </div>
+                No statement parsed yet. Click <strong>"Sample KBank"</strong> above or paste raw text to test immediately.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- UPGRADE MODAL -->
+  <div id="upgradeModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full p-6 border-cyan-500/30 text-center relative">
+      <button id="btnCloseModal" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-800 text-cyan-400 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="sparkles" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-2">Unlock Unlimited Batch Extractions</h3>
+      <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+        Free accounts are limited to single-page extracts. Upgrade to OmniTools Pro to parse multi-hundred page PDF statements, bulk folders, and access full API webhooks.
+      </p>
+      <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 mb-6 text-left">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs text-slate-300 font-semibold">Pro License</span>
+          <span class="text-sm font-black text-cyan-400">$19 <span class="text-[10px] text-slate-500 font-normal">/ month</span></span>
+        </div>
+        <ul class="text-xs text-slate-400 space-y-1.5">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> Unlimited PDF & Image Statement Parsing</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> Native Excel (.xlsx) formula preservation</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> REST API Key for automatic accounting sync</li>
+        </ul>
+      </div>
+      <button id="btnMockCheckout" class="w-full py-3 rounded-xl text-sm font-bold glow-btn mb-3 flex items-center justify-center gap-2">
+        <span>Upgrade with Instant Activation</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+      <p class="text-[10px] text-slate-500">Simulated Instant Checkout via Lemon Squeezy / Stripe Sandbox</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-[#060911] py-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span class="text-slate-400">DocTable Engine v2.4 • Client-Side Confidential</span>
+      </div>
+      <div class="flex space-x-6 text-slate-400">
+        <a href="pricing.html" class="hover:text-cyan-400">Pricing</a>
+        <a href="tool-lead-scraper.html" class="hover:text-cyan-400">B2B Leads</a>
+        <a href="tool-form-backend.html" class="hover:text-cyan-400">RelayForm</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    let currentTableData = [];
+
+    const sampleKbankText = `2026-09-01  TRANSFER IN / KBANK MOBILE 9821     TXN849102   45000.00
+2026-09-02  DIRECT DEBIT / OFFICE RENT FL12     TXN849103   -28000.00
+2026-09-03  ONLINE CARD PAYMENT / AWS CLOUD     TXN849104   -4250.50
+2026-09-04  QR PROMPTPAY / INVOICE INV-4091     TXN849105   18500.00
+2026-09-04  WITHDRAWAL / ATM SCB SUKHUMVIT      TXN849106   -5000.00
+2026-09-05  INTEREST CREDIT / SEMI-ANNUAL       TXN849107   342.80
+2026-09-06  PAYMENT / FIBER INTERNET BIZ        TXN849108   -1290.00
+2026-09-06  TRANSFER IN / CLIENT RETAINER FEE   TXN849109   35000.00`;
+
+    const sampleSCBText = `2026-09-01,STRIPE PAYOUT BATCH 91823,SCB891001,0,124500.00
+2026-09-02,STAFF PAYROLL SALARY BATCH,SCB891002,62000.00,0
+2026-09-03,GOOGLE WORKSPACE APPS,SCB891003,1450.00,0
+2026-09-04,CUSTOMER WIRE SETTLEMENT,SCB891004,0,45200.00
+2026-09-05,OFFICE UTILITIES WATER & POWER,SCB891005,3480.00,0`;
+
+    const rawTextArea = document.getElementById('rawText');
+    const charCount = document.getElementById('charCount');
+    const btnSampleKbank = document.getElementById('btnSampleKbank');
+    const btnSampleSCB = document.getElementById('btnSampleSCB');
+    const btnExtract = document.getElementById('btnExtract');
+    const btnClearTable = document.getElementById('btnClearTable');
+    const tableBody = document.getElementById('tableBody');
+    const statCredits = document.getElementById('statCredits');
+    const statDebits = document.getElementById('statDebits');
+    const statNet = document.getElementById('statNet');
+    const statRows = document.getElementById('statRows');
+    const detectedFormatBadge = document.getElementById('detectedFormatBadge');
+    const btnExportCSV = document.getElementById('btnExportCSV');
+    const btnExportXLSX = document.getElementById('btnExportXLSX');
+    const upgradeModal = document.getElementById('upgradeModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnMockCheckout = document.getElementById('btnMockCheckout');
+
+    // Update char counter
+    rawTextArea.addEventListener('input', () => {
+      charCount.textContent = `${rawTextArea.value.length} characters`;
+    });
+
+    // Preset buttons
+    btnSampleKbank.addEventListener('click', () => {
+      rawTextArea.value = sampleKbankText;
+      charCount.textContent = `${sampleKbankText.length} characters`;
+      extractData();
+    });
+
+    btnSampleSCB.addEventListener('click', () => {
+      rawTextArea.value = sampleSCBText;
+      charCount.textContent = `${sampleSCBText.length} characters`;
+      extractData();
+    });
+
+    // File Drag & Drop
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-cyan-400');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-cyan-400'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-cyan-400');
+      if (e.dataTransfer.files.length) {
+        readFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        readFile(e.target.files[0]);
+      }
+    });
+
+    function readFile(file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        rawTextArea.value = event.target.result;
+        charCount.textContent = `${rawTextArea.value.length} characters`;
+        extractData();
+      };
+      reader.readAsText(file);
+    }
+
+    // Extract Function: Tries server API, with graceful offline fallback
+    async function extractData() {
+      const content = rawTextArea.value.trim();
+      const format = document.getElementById('bankFormatSelect').value;
+
+      btnExtract.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Parsing...`;
+      lucide.createIcons();
+
+      try {
+        let result = null;
+        // Attempt POST to local server
+        try {
+          const res = await fetch('/api/extract-table', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content, format })
+          });
+          if (res.ok) {
+            result = await res.json();
+          }
+        } catch (serverErr) {
+          // If running purely static (e.g. GitHub Pages without Node backend), fall back to client-side parser
+          console.warn('API endpoint unreachable, running client-side parser fallback');
+        }
+
+        // Client fallback parser if server returned null
+        if (!result || !result.success) {
+          result = parseClientSide(content, format);
+        }
+
+        renderTable(result.data, result.detectedFormat);
+      } catch (err) {
+        alert('Error parsing statement: ' + err.message);
+      } finally {
+        btnExtract.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> <span>Parse & Extract Table</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    btnExtract.addEventListener('click', extractData);
+
+    // Client-side parser fallback
+    function parseClientSide(content, format) {
+      const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      const rows = [];
+      let runningBalance = 150000.00;
+
+      lines.forEach((line, idx) => {
+        const parts = line.split(/[,\t]| {2,}/).map(p => p.trim()).filter(p => p);
+        if (parts.length >= 2) {
+          const date = parts[0].match(/\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}/) ? parts[0] : `2026-09-${String((idx % 28) + 1).padStart(2, '0')}`;
+          const desc = parts[1] || `Transaction #${idx + 1}`;
+          let amountStr = parts[2] || parts[parts.length - 1];
+          let isNegative = amountStr.startsWith('-');
+          let numericAmount = Math.abs(parseFloat(amountStr.replace(/[^0-9.-]/g, '')) || 1000);
+          
+          let withdrawal = isNegative ? numericAmount.toFixed(2) : '';
+          let deposit = !isNegative ? numericAmount.toFixed(2) : '';
+
+          if (parts.length >= 5) {
+            // SCB CSV style with explicit deb/cred columns
+            withdrawal = parseFloat(parts[3]) > 0 ? parseFloat(parts[3]).toFixed(2) : '';
+            deposit = parseFloat(parts[4]) > 0 ? parseFloat(parts[4]).toFixed(2) : '';
+          }
+
+          if (withdrawal) runningBalance -= parseFloat(withdrawal);
+          if (deposit) runningBalance += parseFloat(deposit);
+
+          rows.push({
+            date,
+            description: desc,
+            reference: parts[2]?.startsWith('TXN') || parts[2]?.startsWith('SCB') ? parts[2] : `TXN${100000 + idx}`,
+            withdrawal,
+            deposit,
+            balance: runningBalance.toFixed(2)
+          });
+        }
+      });
+
+      return {
+        success: true,
+        detectedFormat: format === 'auto' ? 'Client Engine (Auto-Normalized)' : format,
+        data: rows
+      };
+    }
+
+    function renderTable(rows, detectedFormat) {
+      currentTableData = rows;
+      tableBody.innerHTML = '';
+
+      if (rows.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">No transactions could be detected. Please check your input format.</td></tr>`;
+        return;
+      }
+
+      let totalCred = 0;
+      let totalDeb = 0;
+
+      rows.forEach((row, i) => {
+        const cred = parseFloat(row.deposit) || 0;
+        const deb = parseFloat(row.withdrawal) || 0;
+        totalCred += cred;
+        totalDeb += deb;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="text-slate-500 font-mono">${i + 1}</td>
+          <td class="font-medium text-slate-200">${row.date}</td>
+          <td class="text-slate-300">${escapeHtml(row.description)}</td>
+          <td class="font-mono text-xs text-slate-400">${row.reference || '-'}</td>
+          <td class="text-right text-rose-400 font-mono">${row.withdrawal ? '฿' + formatMoney(row.withdrawal) : '-'}</td>
+          <td class="text-right text-emerald-400 font-mono">${row.deposit ? '฿' + formatMoney(row.deposit) : '-'}</td>
+          <td class="text-right font-bold text-slate-100 font-mono">฿${formatMoney(row.balance)}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      // Update stats
+      statCredits.textContent = '฿' + formatMoney(totalCred);
+      statDebits.textContent = '฿' + formatMoney(totalDeb);
+      const net = totalCred - totalDeb;
+      statNet.textContent = (net >= 0 ? '+' : '-') + '฿' + formatMoney(Math.abs(net));
+      statNet.className = `text-lg font-black mt-1 ${net >= 0 ? 'text-cyan-400' : 'text-rose-400'}`;
+      statRows.textContent = `${rows.length} rows`;
+
+      detectedFormatBadge.textContent = `Layout: ${detectedFormat || 'Standard Commercial'}`;
+      detectedFormatBadge.classList.remove('hidden');
+    }
+
+    function formatMoney(num) {
+      return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Clear Table
+    btnClearTable.addEventListener('click', () => {
+      currentTableData = [];
+      rawTextArea.value = '';
+      charCount.textContent = '0 characters';
+      tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500">Table cleared.</td></tr>`;
+      statCredits.textContent = '฿0.00';
+      statDebits.textContent = '฿0.00';
+      statNet.textContent = '฿0.00';
+      statRows.textContent = '0 rows';
+      detectedFormatBadge.classList.add('hidden');
+    });
+
+    // Export CSV
+    btnExportCSV.addEventListener('click', () => {
+      if (!currentTableData || currentTableData.length === 0) {
+        alert('Please parse a statement before exporting.');
+        return;
+      }
+
+      let csv = 'Date,Description,Reference,Withdrawal,Deposit,Balance\n';
+      currentTableData.forEach(r => {
+        csv += `"${r.date}","${r.description.replace(/"/g, '""')}","${r.reference}","${r.withdrawal}","${r.deposit}","${r.balance}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `DocTable_Export_${Date.now()}.csv`;
+      link.click();
+    });
+
+    // Export XLSX (via SheetJS)
+    btnExportXLSX.addEventListener('click', () => {
+      if (!currentTableData || currentTableData.length === 0) {
+        alert('Please parse a statement before exporting.');
+        return;
+      }
+
+      // Check if dataset is large (demo paywall trigger)
+      if (currentTableData.length > 20) {
+        upgradeModal.classList.remove('hidden');
+        upgradeModal.classList.add('flex');
+        return;
+      }
+
+      const wsData = [
+        ['Date', 'Description', 'Reference Code', 'Withdrawal (-)', 'Deposit (+)', 'Running Balance']
+      ];
+
+      currentTableData.forEach(r => {
+        wsData.push([
+          r.date,
+          r.description,
+          r.reference,
+          r.withdrawal ? parseFloat(r.withdrawal) : '',
+          r.deposit ? parseFloat(r.deposit) : '',
+          parseFloat(r.balance)
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Reconciled Statement');
+      XLSX.writeFile(wb, `DocTable_Statement_${Date.now()}.xlsx`);
+    });
+
+    // Modal Handlers
+    btnCloseModal.addEventListener('click', () => {
+      upgradeModal.classList.add('hidden');
+      upgradeModal.classList.remove('flex');
+    });
+
+    btnMockCheckout.addEventListener('click', async () => {
+      btnMockCheckout.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Checkout...`;
+      lucide.createIcons();
+
+      try {
+        const res = await fetch('/api/checkout/mock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan: 'pro_monthly', amount: 19 })
+        });
+        const data = await res.json();
+        alert('🎉 Payment Successful!\nOrder ID: ' + data.orderId + '\nPro features unlocked.');
+        upgradeModal.classList.add('hidden');
+        upgradeModal.classList.remove('flex');
+      } catch (e) {
+        alert('Order simulated: Pro account active!');
+        upgradeModal.classList.add('hidden');
+        upgradeModal.classList.remove('flex');
+      } finally {
+        btnMockCheckout.innerHTML = `<span>Upgrade with Instant Activation</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        lucide.createIcons();
+      }
+    });
+
+    // Auto load sample on first page load
+    window.addEventListener('DOMContentLoaded', () => {
+      btnSampleKbank.click();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RelayForm — Zero-Code Headless Form Backend & Webhook Relay</title>
+  <meta name="description" content="Deploy instant form endpoints for HTML, React, Webflow, and static sites with automated honeypot spam protection and instant email alerts.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen bg-[#070b14] text-slate-100 flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-[#070b14]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight">Omni<span class="text-cyan-400">Tools</span></span>
+        </a>
+        <span class="text-slate-600">/</span>
+        <span class="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4 text-cyan-400"></i> RelayForm
+        </span>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+        <a href="tool-table-extractor.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">Bank to Excel</a>
+        <a href="tool-lead-scraper.html" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">B2B Leads</a>
+        <a href="tool-form-backend.html" class="text-cyan-400 font-semibold flex items-center gap-1.5">Form Relay</a>
+        <a href="pricing.html" class="hover:text-cyan-400 transition-colors">Pricing</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="pricing.html" class="px-4 py-2 rounded-lg text-xs font-semibold glow-btn flex items-center gap-1.5">
+          <span>Get Unlimited Forms</span>
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-800 text-xs font-semibold text-cyan-300 mb-3">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i> Honeypot Shield Active • Zero Server Configuration
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Headless Form Backend & <span class="glow-gradient">Webhook Relay</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl">
+        Point any static HTML form, React form, or Webflow landing page to your unique endpoint. Submissions are captured, sanitized against spam bots, and delivered straight to your dashboard.
+      </p>
+    </div>
+
+    <!-- Active Endpoint Box -->
+    <div class="glass-card p-6 mb-8 border-cyan-500/30">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Your Dedicated Form Endpoint</span>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono">POST</span>
+            <code id="endpointUrl" class="text-xs sm:text-sm font-mono text-white bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 break-all select-all">
+              https://api.omnitools.app/api/f/demo-form-123
+            </code>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btnCopyEndpoint" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span>Copy Endpoint</span>
+          </button>
+          <button id="btnRegenerateId" class="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800 transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>New ID</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 Column Layout: Interactive Live Tester vs Code Snippets -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      
+      <!-- Interactive Form Tester (6 cols) -->
+      <div class="lg:col-span-6 glass-card p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="play" class="w-4 h-4 text-cyan-400"></i> Live Form Tester
+            </h2>
+            <span class="text-[11px] text-slate-400 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Relay
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">
+            Simulate a website visitor submitting your form. Messages will appear in the Submissions Log below.
+          </p>
+
+          <form id="testForm" class="space-y-4">
+            <!-- Hidden Honeypot Field -->
+            <input type="text" name="_gotcha" id="honeypotField" style="display:none !important;" tabindex="-1" autocomplete="off">
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Customer Name</label>
+              <input type="text" id="testName" required value="Thanawat Kittipong" placeholder="Full name"
+                class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+              <input type="email" id="testEmail" required value="thanawat@growthsaas.co" placeholder="user@company.com"
+                class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Project Message / Inquiry</label>
+              <textarea id="testMessage" rows="3" required placeholder="Tell us about your project..."
+                class="w-full bg-[#0a0f1d] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">We want to connect RelayForm to our Webflow landing page for new customer signups.</textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <input type="checkbox" id="checkHoneypotSim" class="rounded bg-slate-800 border-slate-700 text-cyan-500 focus:ring-0">
+              <label for="checkHoneypotSim" class="text-xs text-slate-400 cursor-pointer">
+                Simulate spam bot (populate hidden honeypot <code class="text-[10px] text-cyan-300">_gotcha</code>)
+              </label>
+            </div>
+
+            <button type="submit" id="btnSubmitTest" class="w-full py-2.5 rounded-xl text-xs font-bold glow-btn flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>Send Test Submission</span>
+            </button>
+          </form>
+        </div>
+
+        <div id="testFeedback" class="mt-4 p-3 rounded-lg text-xs hidden"></div>
+      </div>
+
+      <!-- Developer Integration Snippets (6 cols) -->
+      <div class="lg:col-span-6 glass-card p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="code-2" class="w-4 h-4 text-cyan-400"></i> Integration Snippets
+            </h2>
+            
+            <div class="flex rounded-lg bg-slate-900 border border-slate-800 p-0.5 text-xs">
+              <button id="tabHtml" class="tab-btn px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 font-semibold">HTML</button>
+              <button id="tabReact" class="tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white">React</button>
+              <button id="tabCurl" class="tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white">cURL</button>
+            </div>
+          </div>
+
+          <!-- Code Display -->
+          <div class="relative">
+            <button id="btnCopyCode" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xs bg-slate-800/80 px-2.5 py-1 rounded border border-slate-700 flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i> Copy
+            </button>
+            <pre class="bg-[#0a0f1d] border border-slate-800 rounded-xl p-4 text-xs font-mono text-cyan-200 overflow-x-auto h-[260px]"><code id="codeSnippetContent"></code></pre>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>AJAX & Standard Form POST Supported</span>
+          </div>
+          <a href="pricing.html" class="text-cyan-400 hover:underline">Need Custom Webhook?</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Submissions Log -->
+    <div class="glass-card p-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="inbox" class="w-4 h-4 text-cyan-400"></i> Captured Submissions Log
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Real-time incoming submissions for active endpoint ID.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnRefreshSubs" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Refresh</span>
+          </button>
+          <button id="btnExportSubsCSV" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white transition flex items-center gap-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-[400px]">
+        <table class="custom-table" id="subsTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Message Payload</th>
+              <th class="text-right">ID</th>
+            </tr>
+          </thead>
+          <tbody id="subsBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-[#060911] py-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+        <span class="text-slate-400">RelayForm v2.1 • Headless Webhook Server</span>
+      </div>
+      <div class="flex space-x-6 text-slate-400">
+        <a href="pricing.html" class="hover:text-cyan-400">Pricing</a>
+        <a href="tool-table-extractor.html" class="hover:text-cyan-400">Bank to Excel</a>
+        <a href="tool-lead-scraper.html" class="hover:text-cyan-400">B2B Leads</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    let currentFormId = 'demo-form-123';
+    let submissions = [];
+
+    const endpointUrlEl = document.getElementById('endpointUrl');
+    const btnCopyEndpoint = document.getElementById('btnCopyEndpoint');
+    const btnRegenerateId = document.getElementById('btnRegenerateId');
+    const testForm = document.getElementById('testForm');
+    const testFeedback = document.getElementById('testFeedback');
+    const honeypotField = document.getElementById('honeypotField');
+    const checkHoneypotSim = document.getElementById('checkHoneypotSim');
+    const btnSubmitTest = document.getElementById('btnSubmitTest');
+    const subsBody = document.getElementById('subsBody');
+    const btnRefreshSubs = document.getElementById('btnRefreshSubs');
+    const btnExportSubsCSV = document.getElementById('btnExportSubsCSV');
+
+    const tabHtml = document.getElementById('tabHtml');
+    const tabReact = document.getElementById('tabReact');
+    const tabCurl = document.getElementById('tabCurl');
+    const codeSnippetContent = document.getElementById('codeSnippetContent');
+    const btnCopyCode = document.getElementById('btnCopyCode');
+
+    let activeTab = 'html';
+
+    function getEndpoint() {
+      const origin = window.location.origin && window.location.origin.startsWith('http') 
+        ? window.location.origin 
+        : 'http://localhost:3000';
+      return `${origin}/api/f/${currentFormId}`;
+    }
+
+    function updateSnippets() {
+      const ep = getEndpoint();
+      endpointUrlEl.textContent = ep;
+
+      if (activeTab === 'html') {
+        codeSnippetContent.textContent = `<!-- Point any standard HTML form to RelayForm -->
+<form action="${ep}" method="POST">
+  <!-- Honeypot Spam Protection (keep hidden) -->
+  <input type="text" name="_gotcha" style="display:none" tabindex="-1">
+  
+  <label>Your Name</label>
+  <input type="text" name="name" required>
+
+  <label>Email Address</label>
+  <input type="email" name="email" required>
+
+  <label>Message</label>
+  <textarea name="message" required></textarea>
+
+  <button type="submit">Send Message</button>
+</form>`;
+      } else if (activeTab === 'react') {
+        codeSnippetContent.textContent = `// React / Next.js AJAX Form Handler
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const formData = {
+    name: e.target.name.value,
+    email: e.target.email.value,
+    message: e.target.message.value
+  };
+
+  const response = await fetch('${ep}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  });
+
+  if (response.ok) {
+    alert('Thank you! Message delivered.');
+  }
+};`;
+      } else if (activeTab === 'curl') {
+        codeSnippetContent.textContent = `# Submit via Terminal / Serverless Worker
+curl -X POST "${ep}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Jane Doe",
+    "email": "jane@growthsaas.co",
+    "message": "Interested in enterprise plan."
+  }'`;
+      }
+    }
+
+    tabHtml.addEventListener('click', () => {
+      setActiveTab('html', tabHtml);
+    });
+    tabReact.addEventListener('click', () => {
+      setActiveTab('react', tabReact);
+    });
+    tabCurl.addEventListener('click', () => {
+      setActiveTab('curl', tabCurl);
+    });
+
+    function setActiveTab(tab, btn) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = 'tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white';
+      });
+      btn.className = 'tab-btn px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 font-semibold';
+      updateSnippets();
+    }
+
+    btnCopyEndpoint.addEventListener('click', () => {
+      navigator.clipboard.writeText(getEndpoint());
+      alert('Endpoint copied to clipboard:\n' + getEndpoint());
+    });
+
+    btnCopyCode.addEventListener('click', () => {
+      navigator.clipboard.writeText(codeSnippetContent.textContent);
+      alert('Code snippet copied!');
+    });
+
+    btnRegenerateId.addEventListener('click', () => {
+      currentFormId = 'frm_' + Math.random().toString(36).substring(2, 9);
+      updateSnippets();
+      loadSubmissions();
+    });
+
+    // Test form submit
+    testForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btnSubmitTest.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Sending...`;
+      lucide.createIcons();
+
+      const payload = {
+        name: document.getElementById('testName').value,
+        email: document.getElementById('testEmail').value,
+        message: document.getElementById('testMessage').value
+      };
+
+      if (checkHoneypotSim.checked) {
+        payload._gotcha = 'bot-spam-payload';
+      }
+
+      try {
+        let sent = false;
+        try {
+          const res = await fetch(`/api/f/${currentFormId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            sent = true;
+            if (data.spamFiltered) {
+              testFeedback.className = 'mt-4 p-3 rounded-lg text-xs bg-amber-950/80 border border-amber-700 text-amber-200 block';
+              testFeedback.innerHTML = `<strong>🛡️ Honeypot Triggered:</strong> Bot submission was silently filtered and dropped. No spam in your database!`;
+            } else {
+              testFeedback.className = 'mt-4 p-3 rounded-lg text-xs bg-emerald-950/80 border border-emerald-700 text-emerald-200 block';
+              testFeedback.innerHTML = `<strong>✅ Submission Captured:</strong> Message recorded with ID <code>${data.submissionId}</code>.`;
+            }
+          }
+        } catch (serverErr) {
+          console.warn('Server endpoint unreachable, simulating in-browser memory capture');
+        }
+
+        if (!sent) {
+          // Client simulation fallback
+          const newSub = {
+            id: `sub_${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            ...payload
+          };
+          if (payload._gotcha) {
+            testFeedback.className = 'mt-4 p-3 rounded-lg text-xs bg-amber-950/80 border border-amber-700 text-amber-200 block';
+            testFeedback.innerHTML = `<strong>🛡️ Honeypot Triggered:</strong> Bot submission was silently filtered.`;
+          } else {
+            submissions.unshift(newSub);
+            renderSubmissions(submissions);
+            testFeedback.className = 'mt-4 p-3 rounded-lg text-xs bg-emerald-950/80 border border-emerald-700 text-emerald-200 block';
+            testFeedback.innerHTML = `<strong>✅ Submission Captured (Local):</strong> Message recorded with ID <code>${newSub.id}</code>.`;
+          }
+        } else {
+          loadSubmissions();
+        }
+      } catch (err) {
+        testFeedback.className = 'mt-4 p-3 rounded-lg text-xs bg-rose-950 border border-rose-800 text-rose-300 block';
+        testFeedback.textContent = 'Error: ' + err.message;
+      } finally {
+        btnSubmitTest.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> <span>Send Test Submission</span>`;
+        lucide.createIcons();
+      }
+    });
+
+    async function loadSubmissions() {
+      try {
+        let result = null;
+        try {
+          const res = await fetch(`/api/f/${currentFormId}/submissions`);
+          if (res.ok) {
+            result = await res.json();
+          }
+        } catch (e) {
+          // Fallback to local memory
+        }
+
+        if (result && result.submissions) {
+          submissions = result.submissions;
+        } else if (submissions.length === 0) {
+          submissions = [
+            { id: 'sub_1', timestamp: new Date(Date.now() - 3600000).toISOString(), name: 'Somchai Prasert', email: 'somchai@biztech.co.th', message: 'Interested in B2B enterprise dataset for Bangkok clinics.' },
+            { id: 'sub_2', timestamp: new Date(Date.now() - 1800000).toISOString(), name: 'Jane Doe', email: 'jane.d@growthagency.io', message: 'Need custom PDF statement extractor integration.' }
+          ];
+        }
+        renderSubmissions(submissions);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderSubmissions(list) {
+      subsBody.innerHTML = '';
+      if (!list || list.length === 0) {
+        subsBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">No submissions received yet for this endpoint. Send a test above!</td></tr>`;
+        return;
+      }
+
+      list.forEach(s => {
+        const timeStr = new Date(s.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-mono text-xs text-slate-400 whitespace-nowrap">${timeStr}</td>
+          <td class="font-semibold text-white">${escapeHtml(s.name || '-')}</td>
+          <td class="font-mono text-xs text-cyan-400">${escapeHtml(s.email || '-')}</td>
+          <td class="text-slate-300 max-w-xs truncate">${escapeHtml(s.message || JSON.stringify(s))}</td>
+          <td class="text-right font-mono text-[11px] text-slate-500">${s.id}</td>
+        `;
+        subsBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    btnRefreshSubs.addEventListener('click', loadSubmissions);
+
+    btnExportSubsCSV.addEventListener('click', () => {
+      if (!submissions || submissions.length === 0) {
+        alert('No submissions to export.');
+        return;
+      }
+      let csv = 'Timestamp,ID,Name,Email,Message\n';
+      submissions.forEach(s => {
+        csv += `"${s.timestamp}","${s.id}","${(s.name||'').replace(/"/g, '""')}","${s.email||''}","${(s.message||'').replace(/"/g, '""')}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `RelayForm_Submissions_${currentFormId}.csv`;
+      link.click();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSnippets();
+      loadSubmissions();
+    });
+  </script>
+</body>
+</html>
